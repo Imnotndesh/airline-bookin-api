@@ -28,7 +28,7 @@ class UserController
             $stmt->bindParam(':uname',$trialusername,PDO::PARAM_STR);
             $stmt->execute();
             $user = $stmt ->fetch(PDO::FETCH_ASSOC);
-            if ($user && password_verify($data['password'], $user['PASS_HASH'])) {
+            if ($user && password_verify($trialpassword, $user['PASS_HASH'])) {
                 echo json_encode(['message' => 'Login successful']);
                 return;
             } else {
@@ -80,8 +80,8 @@ class UserController
     {
         $db = Database::connect();
         $data = json_decode(file_get_contents('php://input'), true);
-        $stmt = $db->prepare('UPDATE users SET EMAIL = ?, PHONE = ?, FNAME = ? WHERE UNAME = ?');
-        $stmt->execute([$data['email'], $data['phone'], $data['fname'],$data['username']]);
+        $stmt = $db->prepare('UPDATE users SET EMAIL = ?, PHONE = ?, FNAME = ? , PASS_HASH = ? WHERE UNAME = ?');
+        $stmt->execute([$data['email'], $data['phone'], $data['fname'],password_hash($data['password'],PASSWORD_DEFAULT),$data['username']]);
         http_response_code(200);
         echo json_encode(['message' => 'User updated successfully']);
     }
