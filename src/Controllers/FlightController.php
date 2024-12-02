@@ -8,8 +8,8 @@ class FlightController
         $data = json_decode(file_get_contents('php://input'), true);
 
         $username = $data['username'];
-        $fid = $data['FID'];
-        $ticketsAmt = (int)$data['TICKETS_AMT'];
+        $fid = $data['fid'];
+        $ticketsAmt = (int)$data['tickets_amt'];
 
         try {
             $db = Database::connect();
@@ -32,7 +32,7 @@ class FlightController
             $fname = $user['FNAME'];
 
             // Fetch flight details
-            $stmt = $db->prepare("SELECT DEPARTURE_TIME, PRICE, DESTINATION, AIRLINE, REGNO, AVAILABLESEATS FROM flights WHERE FID = ?");
+            $stmt = $db->prepare("SELECT DEPARTURE_TIME, PRICE, DESTINATION, AIRLINE, REGNO, AVAILABLE_SEATS FROM flights WHERE FID = ?");
             $stmt->execute([$fid]);
             $flight = $stmt->fetch(PDO::FETCH_ASSOC);
 
