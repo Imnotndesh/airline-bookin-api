@@ -5,16 +5,20 @@ class AdminController
 {
     public static function login()
     {
-        $data = json_decode(file_get_contents('php://input'), true);
-        $username = $data['ANAME'];
-        $password = $data['PASSWORD'];
-
         $db = Database::connect();
-        $stmt = $db->prepare("SELECT password FROM admins WHERE username = ?");
+        $data = json_decode(file_get_contents('php://input'), true);
+        $username = $data['username'];
+        $password = $data['password'];
+        if (!isset($username) || !isset($password)) {
+            http_response_code(400);
+            echo json_encode(['error'=>'Missing login credentials']);
+            return;
+        }
+        $stmt = $db->prepare("SELECT PASS_HASH FROM admins WHERE UNAME = ? LIMIT 1");
         $stmt->execute([$username]);
         $admin = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if ($admin && password_verify($password, $admin['password'])) {
+        if ($admin && password_verify($password, $admin['PASS_HASH'])) {
             http_response_code(200);
             echo json_encode(['message' => 'Login successful']);
         } else {

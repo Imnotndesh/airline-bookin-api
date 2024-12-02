@@ -8,20 +8,20 @@ class BookingController
         $data = $_GET;  // Fetch query parameter (UID)
 
         // Check if UID is provided
-        if (!isset($data['UID'])) {
+        if (!isset($data['username'])) {
             http_response_code(400);
-            echo json_encode(['error' => 'UID is required']);
+            echo json_encode(['error' => 'UNAME is required']);
             return;
         }
 
-        $uid = $data['UID'];
+        $username = $data['username'];
 
         try {
             $db = Database::connect();
             
             // Query to fetch all bookings for the user
-            $stmt = $db->prepare("SELECT * FROM bookings WHERE UID = ?");
-            $stmt->execute([$uid]);
+            $stmt = $db->prepare("SELECT * FROM bookings WHERE UNAME = ?");
+            $stmt->execute([$username]);
             
             // Fetch all bookings
             $bookings = $stmt->fetchAll(PDO::FETCH_ASSOC);
