@@ -1,0 +1,73 @@
+<?php
+require_once __DIR__ . '/../src/Database.php';
+
+$db = Database::connect();
+
+// Create Users table
+$db->exec("
+CREATE TABLE IF NOT EXISTS users (
+	    UID INTEGER PRIMARY KEY AUTOINCREMENT,
+	    UNAME TEXT UNIQUE,
+	    PHONE TEXT UNIQUE,
+	    EMAIL TEXT UNIQUE,
+	    FNAME TEXT,
+	    BALANCE INTEGER,
+	    PASS_HASH TEXT UNIQUE
+);
+");
+
+// Create Planes table
+$db->exec("
+CREATE TABLE IF NOT EXISTS planes (
+	    PID INTEGER PRIMARY KEY AUTOINCREMENT,
+	    REGNO TEXT,
+	    H_HOSTESS TEXT,
+	    S_HOSTESS TEXT,
+	    F_CLASS INTEGER,
+	    E_CLASS INTEGER,
+	    CAPACITY INTEGER,
+	    PILOT TEXT,
+	    AIRLINE TEXT
+);
+");
+
+// Create Flights table
+$db->exec("
+CREATE TABLE IF NOT EXISTS flights (
+    FID INTEGER PRIMARY KEY AUTOINCREMENT,
+    DESTINATION TEXT,
+    TERMINAL TEXT,
+    DEPARTURE_TIME TEXT,
+    PRICE INTEGER,
+    AVAILABLE_SEATS INTEGER,
+    AIRLINE TEXT,
+    REGNO TEXT,
+    PID INTEGER,
+    FOREIGN KEY (PID) REFERENCES planes(PID)
+);
+");
+
+// Create Bookings table
+$db->exec("
+CREATE TABLE IF NOT EXISTS bookings (
+			BID  INTEGER PRIMARY KEY AUTOINCREMENT,
+			REGNO TEXT,
+			UID INT,
+			FID INTEGER,
+			DEPARTURE_TIME TEXT,
+			FNAME TEXT,
+			AIRLINE TEXT,
+			TICKETS_AMT INT,
+			DESTINATION TEXT,
+			PRICE INTEGER,
+	    	FOREIGN KEY (UID) REFERENCES users(UID),
+	    	FOREIGN KEY (FID) REFERENCES flights(FID)
+);
+");
+$db->exec("
+CREATE TABLE IF NOT EXISTS admins (
+            AID INTEGER PRIMARY KEY AUTOINCREMENT,
+            PASSWORD TEXT,
+            ANAME TEXT
+);
+");
