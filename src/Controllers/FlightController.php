@@ -7,9 +7,9 @@ class FlightController
     {
         $data = json_decode(file_get_contents('php://input'), true);
 
-        $uid = $data['UID'];
+        $username = $data['username'];
         $fid = $data['FID'];
-        $ticketsAmt = $data['TICKETS_AMT'];
+        $ticketsAmt = (int)$data['TICKETS_AMT'];
 
         try {
             $db = Database::connect();
@@ -18,8 +18,8 @@ class FlightController
             $db->beginTransaction();
 
             // Fetch user name
-            $stmt = $db->prepare("SELECT username FROM users WHERE id = ?");
-            $stmt->execute([$uid]);
+            $stmt = $db->prepare("SELECT FNAME FROM users WHERE UNAME = ?");
+            $stmt->execute([$username]);
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if (!$user) {
@@ -29,10 +29,10 @@ class FlightController
                 return;
             }
 
-            $fname = $user['username'];
+            $fname = $user['FNAME'];
 
             // Fetch flight details
-            $stmt = $db->prepare("SELECT departure_time, price, destination, airline, regno, available_seats FROM flights WHERE id = ?");
+            $stmt = $db->prepare("SELECT DEPARTURE_TIME, PRICE, DESTINATION, AIRLINE, REGNO, AVAILABLESEATS FROM flights WHERE FID = ?");
             $stmt->execute([$fid]);
             $flight = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -43,12 +43,12 @@ class FlightController
                 return;
             }
 
-            $departureTime = $flight['departure_time'];
-            $price = $flight['price'];
-            $destination = $flight['destination'];
-            $airline = $flight['airline'];
-            $regno = $flight['regno'];
-            $availableSeats = $flight['available_seats'];
+            $departureTime = $flight['DEPARTURE_TIME'];
+            $price = $flight['PRICE'];
+            $destination = $flight['DESTINATION'];
+            $airline = $flight['AIRLINE'];
+            $regno = $flight['REGNO'];
+            $availableSeats = $flight['AVAILABLE_SEATS'];
 
             // Check seat availability
             if ($availableSeats < $ticketsAmt) {
@@ -63,17 +63,17 @@ class FlightController
 
             // Reduce available seats
             $newAvailableSeats = $availableSeats - $ticketsAmt;
-            $stmt = $db->prepare("UPDATE flights SET available_seats = ? WHERE id = ?");
+            $stmt = $db->prepare("UPDATE flights SET AVAILABLE_SEATS = ? WHERE FID = ?");
             $stmt->execute([$newAvailableSeats, $fid]);
 
             // Insert into bookings table
             $stmt = $db->prepare("
-                INSERT INTO bookings (regno, user_id, flight_id, departure_time, fname, airline, tickets_amt, destination, price)
+                INSERT INTO bookings (REGNO, UID, FID, DEPARTURE_TIME, FNAME, AIRLINE,TICKETS_AMT, DESTINATION, PRICE)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             ");
             $stmt->execute([
                 $regno,
-                $uid,
+                $username,
                 $fid,
                 $departureTime,
                 $fname,
