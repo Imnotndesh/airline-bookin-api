@@ -144,11 +144,6 @@ class AdminController
     // deleting stuff
     public static function deleteUser()
     {
-        if (isset($data['username'])){
-            http_response_code(400);
-            echo json_encode(['error' => 'username is required']);
-            return;
-        }
         try{
             $db = Database::connect();
             $data = json_decode(file_get_contents('php://input'), true);
@@ -162,11 +157,6 @@ class AdminController
     }
     public static function deletePlane()
     {
-        if (isset($data['pid'])){
-            http_response_code(400);
-            echo json_encode(['error' => 'username is required']);
-            return;
-        }
         try{
             $db = Database::connect();
             $data = json_decode(file_get_contents('php://input'), true);
@@ -180,11 +170,6 @@ class AdminController
     }
     public static function deleteFlight()
     {
-        if (isset($data['fid'])){
-            http_response_code(400);
-            echo json_encode(['error' => 'username is required']);
-            return;
-        }
         try{
             $db = Database::connect();
             $data = json_decode(file_get_contents('php://input'), true);
@@ -196,6 +181,7 @@ class AdminController
             return;
         }
     }
+    
     //viewing stuff
     public static function viewPlanes()
     {
